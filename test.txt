@@ -1,0 +1,11 @@
+@12
+D=M+1
+A=-1
+(LOOP)
+AMD=1
+//this is a comment
+D;JGT
+illegal line
+D=M;JLE
+D=D-M
+@INC
