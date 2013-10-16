@@ -2,7 +2,7 @@
 #Code module for TECS Assembler (Chapter 6).
 #Takes parsed assembly code and translates to machine code instructions.
 ########################################################################
-from hackparser import token_list
+
 
 #hash table mapping assembly dest mnemonic to machine instruction bits
 dest_dict = {'null':'000', 'M':'001', 'D':'010', 'MD':'011', 'A':'100', 
@@ -19,7 +19,7 @@ comp_dict = {'0':'0101010', '1':'0111111', '-1':'0111010', 'D':'0001100', 'A':'0
     '!D':'0001101', '!A':'0110001', '-D':'0001111', '-A':'0110011', 'D+1':'0011111',
 	'A+1':'0110111', 'D-1':'0001110', 'A-1':'0110010', 'D+A':'0000010', 'D-A':'0010011',
 	'A-D':'0000111', 'D&A':'0000000', 'D|A':'0010101', 'M':'1110000', '!M':'1110001', 
-	'M+1':'1110111', 'M-1':'11110010', 'D+M':'1000010', 'D-M':'1010011', 'M-D':'1000111',
+	'M+1':'1110111', 'M-1':'1110010', 'D+M':'1000010', 'D-M':'1010011', 'M-D':'1000111',
 	'D&M':'1000000', 'D|M':'1010101'
 	}
 
@@ -37,7 +37,7 @@ def c_code(token):
     jump = jump_dict[token[3]]
     return '111' + comp + dest + jump
 	
-#main loop -  creates list of individual machine instructions
+#main function -  creates list of individual machine instructions
 machine_list = []
 
 def translate(token_list):
@@ -48,4 +48,4 @@ def translate(token_list):
             machine_list.append(c_code(token))
     return machine_list
 			
-print translate(token_list)
+

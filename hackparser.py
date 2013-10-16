@@ -3,9 +3,12 @@
 ################################################
 
 import ply.lex as lex
+from symbol_table import SymbolTable
+from code import translate
+
 
 tokens = (
-    'A_COMMAND',
+        'A_COMMAND',
 	'C_COMMAND',
 	'L_COMMAND'
 	)
@@ -13,9 +16,9 @@ tokens = (
 #Token definitions
 #
 
-t_A_COMMAND = r'@[0-9]+'
-t_C_COMMAND = r'[M|D|A].+'
-t_L_COMMAND = r'\([A-Z]+\)'
+t_A_COMMAND = r'@[0-9]+|@[A-Za-z_]+'
+t_C_COMMAND = r'[AMDJGTEQLNP01=\+\-\;]+'
+t_L_COMMAND = r'\([A-Z\_\.\$\:]+\)'
 t_ignore = ' \t'
 
 def t_newline(t):
@@ -40,7 +43,7 @@ def symbol(value):
     if '@' in value:
         return value[1:]
     else:
-	    return value[1:-1]
+        return value[1:-1]
 
 #retrieves destination from a C COMMAND if one exists
 def dest(value):
@@ -71,9 +74,10 @@ def jump(value):
 #
 #Get the input file
 #
-prog = open('c:/users/troy/documents/github/hack_assembler/test.txt','r')
+asm = input('Name of .asm file: ')
+prog = open(asm,'r')
 assembly = prog.read()
-prog.close
+prog.close()
 
 
 #
@@ -83,20 +87,52 @@ lexer = lex.lex()
 lexer.input(assembly)
 
 #
-#Main loop
+#Main functions
 #
-	
-token_list = []
 
-while True:
-    token = lexer.token()
-    if not token:
-	    break
-    if token.type == 'A_COMMAND' or token.type == 'L_COMMAND':
-	    token_list.append([token.type, symbol(token.value)])
-    if token.type == 'C_COMMAND':
-	    token_list.append([token.type, comp(token.value), dest(token.value), jump(token.value)])
-		
-		
-print token_list
-		
+
+symbols = SymbolTable()
+
+def first_pass():
+    line_no = 0
+    while True:
+        token = lexer.token()
+        if not token:
+            break
+        if token.type == 'L_COMMAND':
+            symbols.add_entry(symbol(token.value), line_no)
+        else:
+            line_no += 1
+            
+        
+
+def second_pass():
+    token_list = []
+    while True:
+        token = lexer.token()
+        if not token:
+            break
+        if token.type == 'A_COMMAND':
+            if token.value[1] in '1234567890': 
+                token_list.append([token.type, symbol(token.value)])
+            else:
+                if symbols.contains(symbol(token.value)) == True:
+                    token_list.append([token.type, symbols.symbol_table[symbol(token.value)]])
+                else:
+                    symbols.add_entry(symbol(token.value), symbols.next_addr)
+                    token_list.append([token.type, symbols.symbol_table[symbol(token.value)]])
+        if token.type == 'C_COMMAND':
+            token_list.append([token.type, comp(token.value), dest(token.value), jump(token.value)])
+    return token_list
+
+first_pass()
+
+lexer.input(assembly)
+
+hack = asm[0:-4] + '.hack'
+
+hack = open(hack, 'wb')
+for i in translate(second_pass()):
+    hack.write(i + '\n')
+hack.close()
+print symbols.symbol_table
