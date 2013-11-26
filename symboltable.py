@@ -18,7 +18,6 @@ class SymbolTable():
 
     def add_entry(self, symbol, address):
         self.symbol_table[symbol] = address
-        self.next_addr += 1
 	
     def contains(self, symbol):
         return symbol in self.symbol_table

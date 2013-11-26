@@ -1,7 +1,7 @@
-########################################################################
+###############################################################################
 #Code module for TECS Assembler (Chapter 6).
-#Takes parsed assembly code and translates to machine code instructions.
-########################################################################
+#Takes parsed assembly code and translates to 16 bit machine code instructions.
+###############################################################################
 
 
 #hash table mapping assembly dest mnemonic to machine instruction bits
@@ -30,7 +30,7 @@ def a_code(token):
     return '0' + '0' * leading_zeros + str(token_binary)
 
 
-#transates C COMMAND into machine instruction
+#translates C COMMAND into machine instruction
 def c_code(token):
     comp = comp_dict[token[1]]
     dest = dest_dict[token[2]]
@@ -38,9 +38,8 @@ def c_code(token):
     return '111' + comp + dest + jump
 	
 #main function -  creates list of individual machine instructions
-machine_list = []
-
 def translate(token_list):
+    machine_list = []
     for token in token_list:
         if token[0] == 'A_COMMAND':
             machine_list.append(a_code(token))
